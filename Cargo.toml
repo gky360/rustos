@@ -4,4 +4,10 @@ version = "0.1.0"
 authors = ["gky360 <gky360@gmail.com>"]
 edition = "2018"
 
+[profile.dev]
+panic = "abort"
+
+[profile.release]
+panic = "abort"
+
 [dependencies]
