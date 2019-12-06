@@ -5,6 +5,7 @@
 #![reexport_test_harness_main = "test_main"]
 
 use core::panic::PanicInfo;
+use x86_64::instructions::hlt;
 
 pub mod serial;
 pub mod vga_buffer;
@@ -21,7 +22,7 @@ pub fn test_panic_handler(info: &PanicInfo) -> ! {
     serial_println!("[failed]\n");
     serial_println!("Error: {}\n", info);
     exit_qemu(QemuExitCode::Failed);
-    loop {}
+    loop_hlt()
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -45,11 +46,17 @@ pub fn exit_qemu(exit_code: QemuExitCode) {
 #[no_mangle]
 pub extern "C" fn _start() -> ! {
     test_main();
-    loop {}
+    loop_hlt()
 }
 
 #[cfg(test)]
 #[panic_handler]
 fn panic(info: &PanicInfo) -> ! {
     test_panic_handler(info)
+}
+
+pub fn loop_hlt() -> ! {
+    loop {
+        hlt();
+    }
 }

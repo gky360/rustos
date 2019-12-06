@@ -5,13 +5,13 @@
 #![reexport_test_harness_main = "test_main"]
 
 use core::panic::PanicInfo;
-use rustos::{println, serial_print, serial_println};
+use rustos::{loop_hlt, println, serial_print, serial_println};
 
 #[no_mangle]
 pub extern "C" fn _start() -> ! {
     test_main();
 
-    loop {}
+    loop_hlt()
 }
 
 #[panic_handler]
