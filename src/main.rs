@@ -5,24 +5,24 @@
 #![reexport_test_harness_main = "test_main"]
 
 use core::panic::PanicInfo;
-use rustos::println;
+use rustos::loop_hlt;
 
 #[no_mangle]
 pub extern "C" fn _start() -> ! {
-    println!("Hello World{}", "!");
-
     #[cfg(test)]
     test_main();
 
-    loop {}
+    loop_hlt()
 }
 
 /// This function is called on panic.
 #[cfg(not(test))]
 #[panic_handler]
 fn panic(info: &PanicInfo) -> ! {
+    use rustos::println;
+
     println!("{}", info);
-    loop {}
+    loop_hlt()
 }
 
 #[cfg(test)]
