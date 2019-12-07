@@ -9,9 +9,12 @@
 use core::panic::PanicInfo;
 
 pub mod serial;
+pub mod vga;
 mod x86_64;
 
-pub fn init() {}
+pub fn init() {
+    vga::init();
+}
 
 pub fn test_runner(tests: &[&dyn Fn()]) {
     println!("Running {} tests", tests.len());
