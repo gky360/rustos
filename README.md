@@ -3,8 +3,7 @@
 [![Build Code](https://github.com/gky360/rustos/workflows/Build%20Code/badge.svg)](https://github.com/gky360/rustos/actions)
 
 Writing an OS in Rust.
-
-Rust でOS自作入門。
+RustでOS自作入門。
 
 
 ### References
@@ -19,3 +18,5 @@ The following posts and books gave me great help to go through this project.
     - all chapters after Chapter 3
 - [「30日でできる！OS自作入門」をRustで。 - TSUGULOG](https://yoshitsugu.net/tags/OS%E8%87%AA%E4%BD%9C%E5%85%A5%E9%96%80.html)
     - filling the gap between the post "Writing an OS in Rust" and the book "30日でできる！OS自作入門"
+- [x86_64 crate](https://github.com/rust-osdev/x86_64)
+    - supporting x86_64 specific instructions, registers, and structures
