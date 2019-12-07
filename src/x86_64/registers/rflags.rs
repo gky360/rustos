@@ -74,20 +74,4 @@ impl RFlags {
         unsafe { asm!("pushfq; popq $0" : "=r"(r) :: "memory") };
         r
     }
-
-    /// Writes the RFLAGS register, preserves reserved bits.
-    pub fn write(flags: Self) {
-        let old_value = Self::read_raw();
-        let reserved = old_value & !(Self::all().bits());
-        let new_value = reserved | flags.bits();
-
-        Self::write_raw(new_value);
-    }
-
-    /// Writes the RFLAGS register.
-    ///
-    /// Does not preserve any bits, including reserved bits.
-    pub fn write_raw(val: u64) {
-        unsafe { asm!("pushq $0; popfq" :: "r"(val) : "memory" "flags") };
-    }
 }

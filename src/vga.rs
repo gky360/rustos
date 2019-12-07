@@ -57,7 +57,6 @@ struct Color(u8, u8, u8);
 
 use crate::x86_64::instructions::interrupts;
 use crate::x86_64::instructions::port::Port;
-use crate::x86_64::registers::rflags::RFlags;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub struct Palette([Color; 16]);
@@ -66,21 +65,18 @@ impl Palette {
     /// set color palette
     /// ref: chap-04 p84
     fn init(&self) {
-        let flags = RFlags::read();
-        interrupts::disable();
-
-        let mut code_port = Port::new(0x03c8);
-        let mut color_port = Port::new(0x03c9);
-        unsafe { code_port.write(0 as u8) };
-        for color in &self.0 {
-            unsafe {
-                color_port.write(color.0 >> 2);
-                color_port.write(color.1 >> 2);
-                color_port.write(color.2 >> 2);
+        interrupts::without_interrupts(|| {
+            let mut code_port = Port::new(0x03c8);
+            let mut color_port = Port::new(0x03c9);
+            unsafe { code_port.write(0 as u8) };
+            for color in &self.0 {
+                unsafe {
+                    color_port.write(color.0 >> 2);
+                    color_port.write(color.1 >> 2);
+                    color_port.write(color.2 >> 2);
+                }
             }
-        }
-
-        RFlags::write(flags);
+        });
     }
 }
 
