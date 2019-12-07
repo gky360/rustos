@@ -6,7 +6,7 @@
 
 use core::panic::PanicInfo;
 
-use rustos::loop_hlt;
+use rustos::hlt_loop;
 use rustos::vga::{PaletteCode, VGA_HEIGHT, VGA_WIDTH, WRITER};
 
 #[no_mangle]
@@ -46,7 +46,7 @@ pub extern "C" fn _start() -> ! {
         }
     }
 
-    loop_hlt()
+    hlt_loop()
 }
 
 /// This function is called on panic.
@@ -56,7 +56,7 @@ fn panic(info: &PanicInfo) -> ! {
     use rustos::println;
 
     println!("{}", info);
-    loop_hlt()
+    hlt_loop()
 }
 
 #[cfg(test)]

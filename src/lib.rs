@@ -28,10 +28,8 @@ pub fn test_panic_handler(info: &PanicInfo) -> ! {
     println!("[failed]\n");
     println!("Error: {}\n", info);
     exit_qemu(QemuExitCode::Failed);
-    loop_hlt()
+    hlt_loop()
 }
-
-use crate::x86_64::instructions::port::Port;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 #[repr(u32)]
@@ -41,9 +39,19 @@ pub enum QemuExitCode {
 }
 
 pub fn exit_qemu(exit_code: QemuExitCode) {
+    use crate::x86_64::instructions::port::Port;
+
     unsafe {
         let mut port = Port::new(0xf4);
         port.write(exit_code as u32);
+    }
+}
+
+pub fn hlt_loop() -> ! {
+    use crate::x86_64::instructions::hlt;
+
+    loop {
+        hlt();
     }
 }
 
@@ -51,24 +59,13 @@ pub fn exit_qemu(exit_code: QemuExitCode) {
 #[cfg(test)]
 #[no_mangle]
 pub extern "C" fn _start() -> ! {
+    init();
     test_main();
-    loop_hlt()
+    hlt_loop()
 }
 
 #[cfg(test)]
 #[panic_handler]
 fn panic(info: &PanicInfo) -> ! {
     test_panic_handler(info)
-}
-
-pub fn loop_hlt() -> ! {
-    loop {
-        hlt();
-    }
-}
-
-fn hlt() {
-    unsafe {
-        asm!("hlt" :::: "volatile");
-    }
 }
