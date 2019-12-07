@@ -9,10 +9,14 @@ name = "should_panic"
 harness = false
 
 [dependencies]
-bootloader = "0.8.0"
+bitflags = "1.2.1"
 volatile = "0.2.6"
 spin = "0.5.2"
 uart_16550 = "0.2.0"
+
+[dependencies.bootloader]
+version = "0.8.0"
+features = ["vga_320x200"]
 
 [dependencies.lazy_static]
 version = "1.0"
@@ -20,8 +24,12 @@ features = ["spin_no_std"]
 
 
 [package.metadata.bootimage]
+run-args = [
+    "-serial", "stdio",
+]
 test-args = [
-    "-device", "isa-debug-exit,iobase=0xf4,iosize=0x04", "-serial", "stdio",
-    "-display", "none"
+    "-device", "isa-debug-exit,iobase=0xf4,iosize=0x04",
+    "-serial", "stdio",
+    "-display", "none",
 ]
 test-success-exit-code = 33         # (0x10 << 1) | 1
