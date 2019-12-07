@@ -9,6 +9,7 @@ name = "should_panic"
 harness = false
 
 [dependencies]
+bitflags = "1.2.1"
 bootloader = "0.8.0"
 volatile = "0.2.6"
 spin = "0.5.2"

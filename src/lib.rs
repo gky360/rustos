@@ -9,6 +9,8 @@ use core::panic::PanicInfo;
 
 pub mod serial;
 pub mod vga_buffer;
+mod vram;
+mod x86_64;
 
 pub fn test_runner(tests: &[&dyn Fn()]) {
     serial_println!("Running {} tests", tests.len());
@@ -25,26 +27,7 @@ pub fn test_panic_handler(info: &PanicInfo) -> ! {
     loop_hlt()
 }
 
-use core::marker::PhantomData;
-
-struct Port {
-    port: u16,
-    phantom: PhantomData<u32>,
-}
-
-impl Port {
-    pub const fn new(port: u16) -> Port {
-        Port {
-            port,
-            phantom: PhantomData,
-        }
-    }
-
-    #[inline]
-    pub unsafe fn write(&mut self, value: u32) {
-        asm!("outl %eax, %dx" :: "{dx}"(self.port), "{eax}"(value) :: "volatile");
-    }
-}
+use crate::x86_64::instructions::port::Port;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 #[repr(u32)]
