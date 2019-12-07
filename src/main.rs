@@ -18,32 +18,71 @@ pub extern "C" fn _start() -> ! {
     rustos::println!("Hello world!");
 
     {
-        use PaletteCode::*;
-        let colors = [
-            Black,
-            Red,
-            Green,
-            Yellow,
-            Blue,
-            Magenta,
-            Cyan,
-            White,
-            Gray,
-            DarkRed,
-            DarkGreen,
-            DrakYellow,
-            DarkBlue,
-            DarkMagenta,
-            DarkCyan,
-            DarkGray,
-        ];
+        let mut vga = WRITER.lock();
+        vga.fill_rect(0, 0, VGA_WIDTH - 1, VGA_HEIGHT - 29, PaletteCode::DarkCyan);
+        vga.fill_rect(
+            0,
+            VGA_HEIGHT - 28,
+            VGA_WIDTH - 1,
+            VGA_HEIGHT - 28,
+            PaletteCode::Gray,
+        );
+        vga.fill_rect(
+            0,
+            VGA_HEIGHT - 27,
+            VGA_WIDTH - 1,
+            VGA_HEIGHT - 27,
+            PaletteCode::White,
+        );
+        vga.fill_rect(
+            0,
+            VGA_HEIGHT - 26,
+            VGA_WIDTH - 1,
+            VGA_HEIGHT - 1,
+            PaletteCode::Gray,
+        );
 
-        let mut vga_writer = WRITER.lock();
-        for y in 0..VGA_HEIGHT {
-            for x in 0..VGA_WIDTH {
-                vga_writer.write_pixel(x, y, colors[x & 0xf]);
-            }
-        }
+        vga.fill_rect(3, VGA_HEIGHT - 24, 59, VGA_HEIGHT - 24, PaletteCode::White);
+        vga.fill_rect(2, VGA_HEIGHT - 24, 2, VGA_HEIGHT - 4, PaletteCode::White);
+        vga.fill_rect(3, VGA_HEIGHT - 4, 59, VGA_HEIGHT - 4, PaletteCode::DarkGray);
+        vga.fill_rect(
+            59,
+            VGA_HEIGHT - 23,
+            59,
+            VGA_HEIGHT - 5,
+            PaletteCode::DarkGray,
+        );
+        vga.fill_rect(2, VGA_HEIGHT - 3, 59, VGA_HEIGHT - 3, PaletteCode::Black);
+        vga.fill_rect(60, VGA_HEIGHT - 24, 60, VGA_HEIGHT - 3, PaletteCode::Black);
+
+        vga.fill_rect(
+            VGA_WIDTH - 47,
+            VGA_HEIGHT - 24,
+            VGA_WIDTH - 4,
+            VGA_HEIGHT - 24,
+            PaletteCode::DarkGray,
+        );
+        vga.fill_rect(
+            VGA_WIDTH - 47,
+            VGA_HEIGHT - 23,
+            VGA_WIDTH - 47,
+            VGA_HEIGHT - 4,
+            PaletteCode::DarkGray,
+        );
+        vga.fill_rect(
+            VGA_WIDTH - 47,
+            VGA_HEIGHT - 3,
+            VGA_WIDTH - 4,
+            VGA_HEIGHT - 3,
+            PaletteCode::White,
+        );
+        vga.fill_rect(
+            VGA_WIDTH - 3,
+            VGA_HEIGHT - 24,
+            VGA_WIDTH - 3,
+            VGA_HEIGHT - 3,
+            PaletteCode::White,
+        );
     }
 
     hlt_loop()

@@ -99,7 +99,7 @@ impl Writer {
         self.buffer.pixels[y][x].write(code);
     }
 
-    pub fn fill(&mut self, x0: usize, y0: usize, x1: usize, y1: usize, code: PaletteCode) {
+    pub fn fill_rect(&mut self, x0: usize, y0: usize, x1: usize, y1: usize, code: PaletteCode) {
         for y in y0..=y1 {
             for x in x0..=x1 {
                 self.write_pixel(x, y, code);
@@ -108,7 +108,7 @@ impl Writer {
     }
 
     pub fn fill_all(&mut self, code: PaletteCode) {
-        self.fill(0, 0, VGA_WIDTH - 1, VGA_HEIGHT - 1, code);
+        self.fill_rect(0, 0, VGA_WIDTH - 1, VGA_HEIGHT - 1, code);
     }
 }
 
@@ -138,7 +138,7 @@ mod tests {
         interrupts::without_interrupts(|| {
             let mut writer = WRITER.lock();
             writer.fill_all(PaletteCode::White);
-            writer.fill(5, 10, 15, 20, PaletteCode::DarkGray);
+            writer.fill_rect(5, 10, 15, 20, PaletteCode::DarkGray);
             for x in 0..VGA_WIDTH {
                 for y in 0..VGA_HEIGHT {
                     let expected_code = if 5 <= x && 10 <= y && x <= 15 && y <= 20 {
