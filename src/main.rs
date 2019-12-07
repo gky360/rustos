@@ -5,12 +5,16 @@
 #![reexport_test_harness_main = "test_main"]
 
 use core::panic::PanicInfo;
+
 use rustos::loop_hlt;
 
 #[no_mangle]
 pub extern "C" fn _start() -> ! {
     #[cfg(test)]
     test_main();
+
+    rustos::init();
+    rustos::println!("Hello world!");
 
     loop_hlt()
 }

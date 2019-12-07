@@ -9,12 +9,12 @@
 use core::panic::PanicInfo;
 
 pub mod serial;
-pub mod vga_buffer;
-mod vram;
 mod x86_64;
 
+pub fn init() {}
+
 pub fn test_runner(tests: &[&dyn Fn()]) {
-    serial_println!("Running {} tests", tests.len());
+    println!("Running {} tests", tests.len());
     for test in tests {
         test();
     }
@@ -22,8 +22,8 @@ pub fn test_runner(tests: &[&dyn Fn()]) {
 }
 
 pub fn test_panic_handler(info: &PanicInfo) -> ! {
-    serial_println!("[failed]\n");
-    serial_println!("Error: {}\n", info);
+    println!("[failed]\n");
+    println!("Error: {}\n", info);
     exit_qemu(QemuExitCode::Failed);
     loop_hlt()
 }
