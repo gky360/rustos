@@ -32,6 +32,75 @@ lazy_static! {
 
 pub fn init() {
     PALETTE.init();
+    init_screen();
+}
+
+fn init_screen() {
+    let mut writer = WRITER.lock();
+    writer.fill_rect(0, 0, VGA_WIDTH - 1, VGA_HEIGHT - 29, PaletteCode::DarkCyan);
+    writer.fill_rect(
+        0,
+        VGA_HEIGHT - 28,
+        VGA_WIDTH - 1,
+        VGA_HEIGHT - 28,
+        PaletteCode::Gray,
+    );
+    writer.fill_rect(
+        0,
+        VGA_HEIGHT - 27,
+        VGA_WIDTH - 1,
+        VGA_HEIGHT - 27,
+        PaletteCode::White,
+    );
+    writer.fill_rect(
+        0,
+        VGA_HEIGHT - 26,
+        VGA_WIDTH - 1,
+        VGA_HEIGHT - 1,
+        PaletteCode::Gray,
+    );
+
+    writer.fill_rect(3, VGA_HEIGHT - 24, 59, VGA_HEIGHT - 24, PaletteCode::White);
+    writer.fill_rect(2, VGA_HEIGHT - 24, 2, VGA_HEIGHT - 4, PaletteCode::White);
+    writer.fill_rect(3, VGA_HEIGHT - 4, 59, VGA_HEIGHT - 4, PaletteCode::DarkGray);
+    writer.fill_rect(
+        59,
+        VGA_HEIGHT - 23,
+        59,
+        VGA_HEIGHT - 5,
+        PaletteCode::DarkGray,
+    );
+    writer.fill_rect(2, VGA_HEIGHT - 3, 59, VGA_HEIGHT - 3, PaletteCode::Black);
+    writer.fill_rect(60, VGA_HEIGHT - 24, 60, VGA_HEIGHT - 3, PaletteCode::Black);
+
+    writer.fill_rect(
+        VGA_WIDTH - 47,
+        VGA_HEIGHT - 24,
+        VGA_WIDTH - 4,
+        VGA_HEIGHT - 24,
+        PaletteCode::DarkGray,
+    );
+    writer.fill_rect(
+        VGA_WIDTH - 47,
+        VGA_HEIGHT - 23,
+        VGA_WIDTH - 47,
+        VGA_HEIGHT - 4,
+        PaletteCode::DarkGray,
+    );
+    writer.fill_rect(
+        VGA_WIDTH - 47,
+        VGA_HEIGHT - 3,
+        VGA_WIDTH - 4,
+        VGA_HEIGHT - 3,
+        PaletteCode::White,
+    );
+    writer.fill_rect(
+        VGA_WIDTH - 3,
+        VGA_HEIGHT - 24,
+        VGA_WIDTH - 3,
+        VGA_HEIGHT - 3,
+        PaletteCode::White,
+    );
 }
 
 #[allow(dead_code)]
