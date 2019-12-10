@@ -17,7 +17,7 @@ pub fn init() {
 }
 
 pub fn test_runner(tests: &[&dyn Fn()]) {
-    println!("Running {} tests", tests.len());
+    eprintln!("Running {} tests", tests.len());
     for test in tests {
         test();
     }
@@ -25,8 +25,8 @@ pub fn test_runner(tests: &[&dyn Fn()]) {
 }
 
 pub fn test_panic_handler(info: &PanicInfo) -> ! {
-    println!("[failed]\n");
-    println!("Error: {}\n", info);
+    eprintln!("[failed]\n");
+    eprintln!("Error: {}\n", info);
     exit_qemu(QemuExitCode::Failed);
     hlt_loop()
 }

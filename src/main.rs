@@ -15,7 +15,7 @@ pub extern "C" fn _start() -> ! {
     test_main();
 
     rustos::init();
-    rustos::println!("Hello world!");
+    rustos::eprintln!("Hello world!");
 
     {
         let mut vga = WRITER.lock();
@@ -92,9 +92,9 @@ pub extern "C" fn _start() -> ! {
 #[cfg(not(test))]
 #[panic_handler]
 fn panic(info: &PanicInfo) -> ! {
-    use rustos::println;
+    use rustos::eprintln;
 
-    println!("{}", info);
+    eprintln!("{}", info);
     hlt_loop()
 }
 

@@ -115,25 +115,25 @@ impl Writer {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::{print, println};
+    use crate::{eprint, eprintln};
 
     #[test_case]
     fn test_write_pixel() {
-        print!("test_write_pixel... ");
+        eprint!("test_write_pixel... ");
         WRITER.lock().write_pixel(3, 5, PaletteCode::White);
-        println!("[ok]");
+        eprintln!("[ok]");
     }
 
     #[test_case]
     fn test_fill_all() {
-        print!("test_fill_all... ");
+        eprint!("test_fill_all... ");
         WRITER.lock().fill_all(PaletteCode::White);
-        println!("[ok]");
+        eprintln!("[ok]");
     }
 
     #[test_case]
     fn test_fill_output() {
-        print!("test_fill_output... ");
+        eprint!("test_fill_output... ");
 
         interrupts::without_interrupts(|| {
             let mut writer = WRITER.lock();
@@ -152,6 +152,6 @@ mod tests {
             }
         });
 
-        println!("[ok]");
+        eprintln!("[ok]");
     }
 }

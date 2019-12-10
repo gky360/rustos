@@ -11,7 +11,7 @@ lazy_static! {
 }
 
 #[doc(hidden)]
-pub fn _print(args: ::core::fmt::Arguments) {
+pub fn _eprint(args: ::core::fmt::Arguments) {
     use core::fmt::Write;
     SERIAL1
         .lock()
@@ -21,26 +21,26 @@ pub fn _print(args: ::core::fmt::Arguments) {
 
 /// Prints to the host through the serial interface.
 #[macro_export]
-macro_rules! print {
+macro_rules! eprint {
     ($($arg:tt)*) => {
-        $crate::serial::_print(format_args!($($arg)*));
+        $crate::serial::_eprint(format_args!($($arg)*));
     };
 }
 
 /// Prints to the host through the serial interface, appending a newline.
 #[macro_export]
-macro_rules! println {
-    () => ($crate::print!("\n"));
-    ($fmt:expr) => ($crate::print!(concat!($fmt, "\n")));
-    ($fmt:expr, $($arg:tt)*) => ($crate::print!(
+macro_rules! eprintln {
+    () => ($crate::eprint!("\n"));
+    ($fmt:expr) => ($crate::eprint!(concat!($fmt, "\n")));
+    ($fmt:expr, $($arg:tt)*) => ($crate::eprint!(
         concat!($fmt, "\n"), $($arg)*));
 }
 
 #[cfg(test)]
 mod tests {
     #[test_case]
-    fn test_println_simple() {
-        print!("test_println_simple... ");
-        println!("[ok]");
+    fn test_eprintln_simple() {
+        eprint!("test_eprintln_simple... ");
+        eprintln!("[ok]");
     }
 }
