@@ -18,6 +18,11 @@ uart_16550 = "0.2.0"
 version = "0.8.0"
 features = ["vga_320x200"]
 
+[dependencies.font8x8]
+version = "0.2.4"
+default-features = false
+features = ["unicode"]
+
 [dependencies.lazy_static]
 version = "1.0"
 features = ["spin_no_std"]

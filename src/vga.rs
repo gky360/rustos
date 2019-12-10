@@ -22,7 +22,9 @@ lazy_static! {
     ]);
 
     pub static ref WRITER: Mutex<Writer> = Mutex::new(Writer {
-        buffer: unsafe {&mut *(0xa0000 as *mut Buffer)}
+        buffer: unsafe {&mut *(0xa0000 as *mut Buffer)},
+        row_pos:0,
+        col_pos: 0
     });
 }
 
@@ -82,6 +84,10 @@ impl Palette {
 
 pub const VGA_HEIGHT: usize = 200;
 pub const VGA_WIDTH: usize = 320;
+pub const CHAR_HEIGHT: usize = 8;
+pub const CHAR_WIDTH: usize = 8;
+pub const VGA_ROWS: usize = VGA_HEIGHT / CHAR_HEIGHT;
+pub const VGA_COLS: usize = VGA_WIDTH / CHAR_WIDTH;
 
 use volatile::Volatile;
 
@@ -92,6 +98,8 @@ struct Buffer {
 
 pub struct Writer {
     buffer: &'static mut Buffer,
+    row_pos: usize,
+    col_pos: usize,
 }
 
 impl Writer {
@@ -109,6 +117,51 @@ impl Writer {
 
     pub fn fill_all(&mut self, code: PaletteCode) {
         self.fill_rect(0, 0, VGA_WIDTH - 1, VGA_HEIGHT - 1, code);
+    }
+
+    pub fn write_char(&mut self, c: char, code: PaletteCode) {
+        use font8x8::UnicodeFonts;
+        match c {
+            '\n' => self.newline(),
+            _ => {
+                let rendered = match font8x8::BASIC_FONTS.get(c) {
+                    Some(rendered) => rendered,
+                    None => return self.write_unprintable_char(code),
+                };
+                for (y, byte) in rendered.iter().enumerate() {
+                    for x in 0..8 {
+                        if ((*byte) >> x) & 1 == 0 {
+                            continue;
+                        }
+                        self.write_pixel(
+                            self.col_pos * CHAR_WIDTH + x,
+                            self.row_pos * CHAR_HEIGHT + y,
+                            code,
+                        );
+                    }
+                }
+            }
+        }
+    }
+
+    pub fn write_str(&mut self, s: &str, code: PaletteCode) {
+        for c in s.chars() {
+            self.write_char(c, code);
+        }
+    }
+
+    pub fn write_unprintable_char(&mut self, code: PaletteCode) {
+        let x0 = self.col_pos * CHAR_WIDTH;
+        let y0 = self.row_pos * CHAR_HEIGHT;
+        let x1 = x0 + CHAR_WIDTH - 1;
+        let y1 = y0 + CHAR_HEIGHT - 1;
+        self.fill_rect(x0, y0, x1, y1, code);
+    }
+
+    pub fn newline(&mut self) {
+        // TODO: clear row when all rows are already used
+        self.row_pos = (self.row_pos + 1) % VGA_ROWS;
+        self.col_pos = 0;
     }
 }
 

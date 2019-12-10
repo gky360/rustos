@@ -75,6 +75,7 @@ version = "0.1.0"
 dependencies = [
  "bitflags",
  "bootloader",
+ "font8x8",
  "lazy_static",
  "spin",
  "uart_16550",
