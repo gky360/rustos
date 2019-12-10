@@ -1,4 +1,5 @@
 use core::fmt;
+use font8x8::UnicodeFonts;
 use lazy_static::lazy_static;
 use spin::Mutex;
 
@@ -116,12 +117,13 @@ impl Writer {
         }
     }
 
-    pub fn fill_all(&mut self, code: PaletteCode) {
+    pub fn clear_screen(&mut self, code: PaletteCode) {
         self.fill_rect(0, 0, VGA_WIDTH - 1, VGA_HEIGHT - 1, code);
+        self.row_pos = 0;
+        self.col_pos = 0;
     }
 
     pub fn write_char(&mut self, c: char, code: PaletteCode) {
-        use font8x8::UnicodeFonts;
         match c {
             '\n' => self.newline(),
             _ => {
@@ -222,9 +224,14 @@ mod tests {
     }
 
     #[test_case]
-    fn test_fill_all() {
-        eprint!("test_fill_all... ");
-        WRITER.lock().fill_all(PaletteCode::White);
+    fn test_clear_screen() {
+        eprint!("test_clear_screen... ");
+        interrupts::without_interrupts(|| {
+            let mut writer = WRITER.lock();
+            writer.clear_screen(PaletteCode::White);
+            assert_eq!(writer.row_pos, 0);
+            assert_eq!(writer.col_pos, 0);
+        });
         eprintln!("[ok]");
     }
 
@@ -234,7 +241,7 @@ mod tests {
 
         interrupts::without_interrupts(|| {
             let mut writer = WRITER.lock();
-            writer.fill_all(PaletteCode::White);
+            writer.clear_screen(PaletteCode::White);
             writer.fill_rect(5, 10, 15, 20, PaletteCode::DarkGray);
             for x in 0..VGA_WIDTH {
                 for y in 0..VGA_HEIGHT {
@@ -245,6 +252,55 @@ mod tests {
                     };
                     let code = writer.buffer.pixels[y][x].read();
                     assert_eq!(code, expected_code);
+                }
+            }
+        });
+
+        eprintln!("[ok]");
+    }
+
+    #[test_case]
+    fn test_println_simple() {
+        eprint!("test_println... ");
+        println!("test_println_simple output");
+        eprintln!("[ok]");
+    }
+
+    #[test_case]
+    fn test_println_many() {
+        eprint!("test_println_many... ");
+        for _ in 0..200 {
+            println!("test_println_many output");
+        }
+        eprintln!("[ok]");
+    }
+
+    #[test_case]
+    fn test_println_output() {
+        use crate::x86_64::instructions::interrupts;
+        use core::fmt::Write;
+
+        eprint!("test_println_output... ");
+
+        let s = "Single line test string";
+        interrupts::without_interrupts(|| {
+            let mut writer = WRITER.lock();
+            writer.clear_screen(PaletteCode::Blue);
+
+            writeln!(writer, "\n{}", s).expect("writeln failed");
+            for (i, c) in s.chars().enumerate() {
+                let rendered = font8x8::BASIC_FONTS.get(c).unwrap();
+                for (y, byte) in rendered.iter().enumerate() {
+                    for x in 0..8 {
+                        let pixel =
+                            writer.buffer.pixels[CHAR_HEIGHT + y][CHAR_WIDTH * i + x].read();
+                        let expected = if ((*byte) >> x) & 1 == 0 {
+                            PaletteCode::Blue
+                        } else {
+                            PaletteCode::White
+                        };
+                        assert_eq!(pixel, expected);
+                    }
                 }
             }
         });

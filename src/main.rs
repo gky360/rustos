@@ -11,10 +11,10 @@ use rustos::vga::{PaletteCode, VGA_HEIGHT, VGA_WIDTH, WRITER};
 
 #[no_mangle]
 pub extern "C" fn _start() -> ! {
+    rustos::init();
+
     #[cfg(test)]
     test_main();
-
-    rustos::init();
 
     {
         let mut vga = WRITER.lock();
