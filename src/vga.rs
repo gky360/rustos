@@ -33,56 +33,83 @@ lazy_static! {
 pub fn init() {
     PALETTE.init();
     init_screen();
+    init_mouse_cursor();
 }
+
+const TASK_BAR_HEIGHT: usize = 24;
 
 fn init_screen() {
     let mut writer = WRITER.lock();
-    writer.fill_rect(0, 0, VGA_WIDTH - 1, VGA_HEIGHT - 29, PaletteCode::DarkCyan);
     writer.fill_rect(
         0,
-        VGA_HEIGHT - 28,
+        0,
         VGA_WIDTH - 1,
-        VGA_HEIGHT - 28,
+        VGA_HEIGHT - TASK_BAR_HEIGHT - 1,
+        PaletteCode::DarkCyan,
+    );
+    writer.fill_rect(
+        0,
+        VGA_HEIGHT - TASK_BAR_HEIGHT,
+        VGA_WIDTH - 1,
+        VGA_HEIGHT - TASK_BAR_HEIGHT,
         PaletteCode::Gray,
     );
     writer.fill_rect(
         0,
-        VGA_HEIGHT - 27,
+        VGA_HEIGHT - TASK_BAR_HEIGHT + 1,
         VGA_WIDTH - 1,
-        VGA_HEIGHT - 27,
+        VGA_HEIGHT - TASK_BAR_HEIGHT + 1,
         PaletteCode::White,
     );
     writer.fill_rect(
         0,
-        VGA_HEIGHT - 26,
+        VGA_HEIGHT - TASK_BAR_HEIGHT + 2,
         VGA_WIDTH - 1,
         VGA_HEIGHT - 1,
         PaletteCode::Gray,
     );
 
-    writer.fill_rect(3, VGA_HEIGHT - 24, 59, VGA_HEIGHT - 24, PaletteCode::White);
-    writer.fill_rect(2, VGA_HEIGHT - 24, 2, VGA_HEIGHT - 4, PaletteCode::White);
+    writer.fill_rect(
+        3,
+        VGA_HEIGHT - TASK_BAR_HEIGHT + 4,
+        59,
+        VGA_HEIGHT - TASK_BAR_HEIGHT + 4,
+        PaletteCode::White,
+    );
+    writer.fill_rect(
+        2,
+        VGA_HEIGHT - TASK_BAR_HEIGHT + 4,
+        2,
+        VGA_HEIGHT - 4,
+        PaletteCode::White,
+    );
     writer.fill_rect(3, VGA_HEIGHT - 4, 59, VGA_HEIGHT - 4, PaletteCode::DarkGray);
     writer.fill_rect(
         59,
-        VGA_HEIGHT - 23,
+        VGA_HEIGHT - TASK_BAR_HEIGHT + 5,
         59,
         VGA_HEIGHT - 5,
         PaletteCode::DarkGray,
     );
     writer.fill_rect(2, VGA_HEIGHT - 3, 59, VGA_HEIGHT - 3, PaletteCode::Black);
-    writer.fill_rect(60, VGA_HEIGHT - 24, 60, VGA_HEIGHT - 3, PaletteCode::Black);
+    writer.fill_rect(
+        60,
+        VGA_HEIGHT - TASK_BAR_HEIGHT + 4,
+        60,
+        VGA_HEIGHT - 3,
+        PaletteCode::Black,
+    );
 
     writer.fill_rect(
         VGA_WIDTH - 47,
-        VGA_HEIGHT - 24,
+        VGA_HEIGHT - TASK_BAR_HEIGHT + 4,
         VGA_WIDTH - 4,
-        VGA_HEIGHT - 24,
+        VGA_HEIGHT - TASK_BAR_HEIGHT + 4,
         PaletteCode::DarkGray,
     );
     writer.fill_rect(
         VGA_WIDTH - 47,
-        VGA_HEIGHT - 23,
+        VGA_HEIGHT - TASK_BAR_HEIGHT + 5,
         VGA_WIDTH - 47,
         VGA_HEIGHT - 4,
         PaletteCode::DarkGray,
@@ -96,11 +123,47 @@ fn init_screen() {
     );
     writer.fill_rect(
         VGA_WIDTH - 3,
-        VGA_HEIGHT - 24,
+        VGA_HEIGHT - TASK_BAR_HEIGHT + 4,
         VGA_WIDTH - 3,
         VGA_HEIGHT - 3,
         PaletteCode::White,
     );
+}
+
+const MOUSE_CURSOR_HEIGHT: usize = 16;
+const MOUSE_CURSOR_WIDTH: usize = 16;
+const MOUSE_X: usize = (VGA_WIDTH - MOUSE_CURSOR_WIDTH) / 2;
+const MOUSE_Y: usize = (VGA_HEIGHT - MOUSE_CURSOR_HEIGHT - TASK_BAR_HEIGHT) / 2;
+const MOUSE_CURSOR_IMAGE: [[u8; MOUSE_CURSOR_WIDTH]; MOUSE_CURSOR_HEIGHT] = [
+    *b"**************..",
+    *b"*OOOOOOOOOOO*...",
+    *b"*OOOOOOOOOO*....",
+    *b"*OOOOOOOOO*.....",
+    *b"*OOOOOOOO*......",
+    *b"*OOOOOOO*.......",
+    *b"*OOOOOOO*.......",
+    *b"*OOOOOOOO*......",
+    *b"*OOOO**OOO*.....",
+    *b"*OOO*..*OOO*....",
+    *b"*OO*....*OOO*...",
+    *b"*O*......*OOO*..",
+    *b"**........*OOO*.",
+    *b"*..........*OOO*",
+    *b"............*OO*",
+    *b".............***",
+];
+
+fn init_mouse_cursor() {
+    let mut writer = WRITER.lock();
+    for y in 0..MOUSE_CURSOR_HEIGHT {
+        for x in 0..MOUSE_CURSOR_WIDTH {
+            match MOUSE_CURSOR_IMAGE[y][x] {
+                b'*' => writer.write_pixel(MOUSE_X + x, MOUSE_Y + y, PaletteCode::Black),
+                b'O' => writer.write_pixel(MOUSE_X + x, MOUSE_Y + y, PaletteCode::White),
+                _ => (),
+            };
+        }
+    }
 }
 
 #[allow(dead_code)]
