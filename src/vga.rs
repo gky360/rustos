@@ -1,3 +1,4 @@
+use core::fmt;
 use lazy_static::lazy_static;
 use spin::Mutex;
 
@@ -140,11 +141,16 @@ impl Writer {
                         );
                     }
                 }
+
+                self.col_pos += 1;
+                if self.col_pos >= VGA_COLS {
+                    self.newline();
+                }
             }
         }
     }
 
-    pub fn write_str(&mut self, s: &str, code: PaletteCode) {
+    pub fn write_string(&mut self, s: &str, code: PaletteCode) {
         for c in s.chars() {
             self.write_char(c, code);
         }
@@ -163,6 +169,44 @@ impl Writer {
         self.row_pos = (self.row_pos + 1) % VGA_ROWS;
         self.col_pos = 0;
     }
+}
+
+impl fmt::Write for Writer {
+    fn write_str(&mut self, s: &str) -> fmt::Result {
+        self.write_string(s, PaletteCode::White);
+        Ok(())
+    }
+}
+
+#[doc(hidden)]
+/// Prints the given formatted string to the screen
+/// through the global `WRITER` instance.
+pub fn _print(args: ::core::fmt::Arguments) {
+    use core::fmt::Write;
+
+    interrupts::without_interrupts(|| {
+        WRITER
+            .lock()
+            .write_fmt(args)
+            .expect("Printing to vga failed");
+    });
+}
+
+/// Prints to the screen through the vga interface.
+#[macro_export]
+macro_rules! print {
+    ($($arg:tt)*) => {
+        $crate::vga::_print(format_args!($($arg)*));
+    };
+}
+
+/// Prints to the screen through the vga interface, appending a newline.
+#[macro_export]
+macro_rules! println {
+    () => ($crate::print!("\n"));
+    ($fmt:expr) => ($crate::print!(concat!($fmt, "\n")));
+    ($fmt:expr, $($arg:tt)*) => ($crate::print!(
+        concat!($fmt, "\n"), $($arg)*));
 }
 
 #[cfg(test)]

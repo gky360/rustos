@@ -15,7 +15,6 @@ pub extern "C" fn _start() -> ! {
     test_main();
 
     rustos::init();
-    rustos::eprintln!("Hello world!");
 
     {
         let mut vga = WRITER.lock();
@@ -84,6 +83,8 @@ pub extern "C" fn _start() -> ! {
             PaletteCode::White,
         );
     }
+
+    rustos::println!("Hello world!");
 
     hlt_loop()
 }
