@@ -1,18 +1,9 @@
+use bit_field::BitField;
+use bitflags::bitflags;
+use core::fmt;
 use core::marker::PhantomData;
-use lazy_static::lazy_static;
 
 use crate::x86_64::VirtAddr;
-
-lazy_static! {
-    static ref IDT: InterruptDescriptorTable = {
-        let idt = InterruptDescriptorTable::new();
-        idt
-    };
-}
-
-pub fn init() {
-    IDT.load();
-}
 
 // #[allow(missing_debug_implementations)]
 #[derive(Clone)]
@@ -104,6 +95,15 @@ pub struct Entry<F> {
     phantom: PhantomData<F>,
 }
 
+pub type HandlerFunc = extern "x86-interrupt" fn(&mut InterruptStackFrame);
+pub type HandlerFuncWithErrCode =
+    extern "x86-interrupt" fn(&mut InterruptStackFrame, error_code: u64);
+pub type PageFaultHandlerFunc =
+    extern "x86-interrupt" fn(&mut InterruptStackFrame, error_code: PageFaultErrorCode);
+pub type DivergingHandlerFunc = extern "x86-interrupt" fn(&mut InterruptStackFrame) -> !;
+pub type DivergingHandlerFuncWithErrCode =
+    extern "x86-interrupt" fn(&mut InterruptStackFrame, error_code: u64) -> !;
+
 impl<F> Entry<F> {
     pub const fn missing() -> Self {
         Entry {
@@ -116,16 +116,39 @@ impl<F> Entry<F> {
             phantom: PhantomData,
         }
     }
+
+    #[cfg(target_arch = "x86_64")]
+    fn set_handler_addr(&mut self, addr: u64) -> &mut EntryOptions {
+        use crate::x86_64::instructions::segmentation;
+
+        self.pointer_low = addr as u16;
+        self.pointer_middle = (addr >> 16) as u16;
+        self.pointer_high = (addr >> 32) as u32;
+
+        self.gdt_selector = segmentation::cs().0;
+
+        self.options.set_present(true);
+        &mut self.options
+    }
 }
 
-pub type HandlerFunc = extern "x86-interrupt" fn(&mut InterruptStackFrame);
-pub type HandlerFuncWithErrCode =
-    extern "x86-interrupt" fn(&mut InterruptStackFrame, error_code: u64);
-pub type PageFaultHandlerFunc =
-    extern "x86-interrupt" fn(&mut InterruptStackFrame, error_code: u64); // TODO: impl and use PageFaultErrorCode
-pub type DivergingHandlerFunc = extern "x86-interrupt" fn(&mut InterruptStackFrame) -> !;
-pub type DivergingHandlerFuncWithErrCode =
-    extern "x86-interrupt" fn(&mut InterruptStackFrame, error_code: u64) -> !;
+macro_rules! impl_set_handler_fn {
+    ($h:ty) => {
+        #[cfg(target_arch = "x86_64")]
+        impl Entry<$h> {
+            #[allow(dead_code)]
+            pub fn set_handler_fn(&mut self, handler: $h) -> &mut EntryOptions {
+                self.set_handler_addr(handler as u64)
+            }
+        }
+    };
+}
+
+impl_set_handler_fn!(HandlerFunc);
+impl_set_handler_fn!(HandlerFuncWithErrCode);
+impl_set_handler_fn!(PageFaultHandlerFunc);
+impl_set_handler_fn!(DivergingHandlerFunc);
+impl_set_handler_fn!(DivergingHandlerFuncWithErrCode);
 
 #[repr(transparent)]
 #[derive(Debug, Clone, Copy, PartialEq)]
@@ -135,11 +158,30 @@ impl EntryOptions {
     const fn minimal() -> Self {
         EntryOptions(0b0000_1110_0000_0000)
     }
+
+    pub fn set_present(&mut self, present: bool) -> &mut Self {
+        self.0.set_bit(15, present);
+        self
+    }
 }
 
 #[repr(C)]
 pub struct InterruptStackFrame {
     value: InterruptStackFrameValue,
+}
+
+impl fmt::Debug for InterruptStackFrame {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        self.value.fmt(f)
+    }
+}
+
+struct Hex(u64);
+
+impl fmt::Debug for Hex {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        write!(f, "{:#x}", self.0)
+    }
 }
 
 #[derive(Clone)]
@@ -150,4 +192,26 @@ pub struct InterruptStackFrameValue {
     pub cpu_flags: u64,
     pub stack_pointer: VirtAddr,
     pub stack_segment: u64,
+}
+
+impl fmt::Debug for InterruptStackFrameValue {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        let mut s = f.debug_struct("InterruptStackFrame");
+        s.field("instruction_pointer", &self.instruction_pointer);
+        s.field("code_segment", &self.code_segment);
+        s.field("cpu_flags", &Hex(self.cpu_flags));
+        s.field("stack_pointer", &self.stack_pointer);
+        s.field("stack_segment", &self.stack_segment);
+        s.finish()
+    }
+}
+
+bitflags! {
+    pub struct PageFaultErrorCode: u64 {
+        const PROTECTION_VIOLATION = 1 << 0;
+        const CAUSED_BY_WRITE = 1 << 1;
+        const USER_MODE = 1 << 2;
+        const MALFORMED_TABLE = 1 << 3;
+        const INSTRUCTION_FETCH = 1 << 4;
+    }
 }

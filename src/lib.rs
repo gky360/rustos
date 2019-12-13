@@ -9,14 +9,13 @@
 
 use core::panic::PanicInfo;
 
+mod interrupts;
 pub mod serial;
 pub mod vga;
-mod x86_64;
+pub mod x86_64;
 
 pub fn init() {
-    use x86_64::structures::idt;
-
-    idt::init();
+    interrupts::init_idt();
     vga::init();
 }
 
