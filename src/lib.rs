@@ -1,5 +1,6 @@
 #![no_std]
 #![cfg_attr(test, no_main)]
+#![feature(abi_x86_interrupt)]
 #![feature(asm)]
 #![feature(const_fn)]
 #![feature(custom_test_frameworks)]
@@ -8,16 +9,18 @@
 
 use core::panic::PanicInfo;
 
+mod interrupts;
 pub mod serial;
 pub mod vga;
-mod x86_64;
+pub mod x86_64;
 
 pub fn init() {
+    interrupts::init_idt();
     vga::init();
 }
 
 pub fn test_runner(tests: &[&dyn Fn()]) {
-    println!("Running {} tests", tests.len());
+    eprintln!("Running {} tests", tests.len());
     for test in tests {
         test();
     }
@@ -25,8 +28,8 @@ pub fn test_runner(tests: &[&dyn Fn()]) {
 }
 
 pub fn test_panic_handler(info: &PanicInfo) -> ! {
-    println!("[failed]\n");
-    println!("Error: {}\n", info);
+    eprintln!("[failed]\n");
+    eprintln!("Error: {}\n", info);
     exit_qemu(QemuExitCode::Failed);
     hlt_loop()
 }

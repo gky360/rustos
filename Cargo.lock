@@ -73,8 +73,10 @@ dependencies = [
 name = "rustos"
 version = "0.1.0"
 dependencies = [
+ "bit_field",
  "bitflags",
  "bootloader",
+ "font8x8",
  "lazy_static",
  "spin",
  "uart_16550",

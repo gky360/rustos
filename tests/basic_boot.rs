@@ -5,7 +5,7 @@
 #![reexport_test_harness_main = "test_main"]
 
 use core::panic::PanicInfo;
-use rustos::{print, println};
+use rustos::{eprint, eprintln, println};
 
 #[no_mangle]
 pub extern "C" fn _start() -> ! {
@@ -21,6 +21,13 @@ fn panic(info: &PanicInfo) -> ! {
 
 #[test_case]
 fn test_println() {
-    print!("test_println... ");
-    println!("[ok]");
+    eprint!("test_println... ");
+    println!("test_println output");
+    eprintln!("[ok]");
+}
+
+#[test_case]
+fn test_eprintln() {
+    eprint!("test_eprintln... ");
+    eprintln!("[ok]");
 }
