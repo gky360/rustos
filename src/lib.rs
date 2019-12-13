@@ -14,6 +14,9 @@ pub mod vga;
 mod x86_64;
 
 pub fn init() {
+    use x86_64::structures::idt;
+
+    idt::init();
     vga::init();
 }
 
