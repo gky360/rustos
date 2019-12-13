@@ -50,7 +50,12 @@ jobs:
 
         # install QEMU
       - name: Install QEMU (Linux)
-        run: sudo apt update && sudo apt install qemu-system-x86
+        run: |
+          # workaround for unsuccessful `apt update`
+          sudo rm -f /etc/apt/sources.list.d/dotnetdev.list /etc/apt/sources.list.d/microsoft-prod.list
+
+          sudo apt update
+          sudo apt install qemu-system-x86
         if: runner.os == 'Linux'
       - name: Install QEMU (macOS)
         run: brew install qemu
