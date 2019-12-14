@@ -9,6 +9,7 @@ pub fn init() {
     init_idt();
     init_pics();
     crate::x86_64::instructions::interrupts::enable();
+    allow_input();
 }
 
 lazy_static! {
@@ -64,6 +65,14 @@ pub static PICS: spin::Mutex<ChainedPics> =
 
 fn init_pics() {
     unsafe { PICS.lock().initialize() };
+}
+
+fn allow_input() {
+    unsafe {
+        let mut pics = PICS.lock();
+        pics.enable_interrupt(InterruptIndex::Keyboard.as_u8());
+        pics.enable_interrupt(InterruptIndex::Mouse.as_u8());
+    }
 }
 
 #[derive(Debug, Clone, Copy)]

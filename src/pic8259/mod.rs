@@ -26,6 +26,11 @@ impl Pic {
     unsafe fn end_of_interrupt(&mut self) {
         self.command.write(CMD_END_OF_INTERRUPT);
     }
+
+    unsafe fn enable_interrupt(&mut self, interrupt_id: u8) {
+        let interrupt_mask = 0b1111_1111 ^ (1 << (interrupt_id - self.offset));
+        self.data.write(interrupt_mask);
+    }
 }
 
 pub struct ChainedPics {
@@ -61,6 +66,14 @@ impl ChainedPics {
         for pic in self.pics.iter_mut() {
             if pic.handles_interrupt(interrupt_id) {
                 pic.end_of_interrupt();
+            }
+        }
+    }
+
+    pub unsafe fn enable_interrupt(&mut self, interrupt_id: u8) {
+        for pic in self.pics.iter_mut() {
+            if pic.handles_interrupt(interrupt_id) {
+                pic.enable_interrupt(interrupt_id);
             }
         }
     }
