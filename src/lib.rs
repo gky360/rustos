@@ -10,6 +10,7 @@
 use core::panic::PanicInfo;
 
 mod interrupts;
+mod pic8259;
 pub mod serial;
 pub mod vga;
 pub mod x86_64;
