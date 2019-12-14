@@ -16,7 +16,6 @@ impl PortWrite for u32 {
     }
 }
 
-/// An I/O port.
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct Port<T: PortWrite> {
     port: u16,
@@ -24,7 +23,6 @@ pub struct Port<T: PortWrite> {
 }
 
 impl<T: PortWrite> Port<T> {
-    /// Creates an I/O port with the given port number.
     pub const fn new(port: u16) -> Port<T> {
         Port {
             port: port,
@@ -32,10 +30,6 @@ impl<T: PortWrite> Port<T> {
         }
     }
 
-    /// Writes to the port.
-    ///
-    /// This function is unsafe because the I/O port could have side effects that violate memory
-    /// safety.
     #[inline]
     pub unsafe fn write(&mut self, value: T) {
         T::write_to_port(self.port, value)

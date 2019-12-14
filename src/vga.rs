@@ -39,95 +39,97 @@ pub fn init() {
 const TASK_BAR_HEIGHT: usize = 24;
 
 fn init_screen() {
-    let mut writer = WRITER.lock();
-    writer.fill_rect(
-        0,
-        0,
-        VGA_WIDTH - 1,
-        VGA_HEIGHT - TASK_BAR_HEIGHT - 1,
-        PaletteCode::DarkCyan,
-    );
-    writer.fill_rect(
-        0,
-        VGA_HEIGHT - TASK_BAR_HEIGHT,
-        VGA_WIDTH - 1,
-        VGA_HEIGHT - TASK_BAR_HEIGHT,
-        PaletteCode::Gray,
-    );
-    writer.fill_rect(
-        0,
-        VGA_HEIGHT - TASK_BAR_HEIGHT + 1,
-        VGA_WIDTH - 1,
-        VGA_HEIGHT - TASK_BAR_HEIGHT + 1,
-        PaletteCode::White,
-    );
-    writer.fill_rect(
-        0,
-        VGA_HEIGHT - TASK_BAR_HEIGHT + 2,
-        VGA_WIDTH - 1,
-        VGA_HEIGHT - 1,
-        PaletteCode::Gray,
-    );
+    interrupts::without_interrupts(|| {
+        let mut writer = WRITER.lock();
+        writer.fill_rect(
+            0,
+            0,
+            VGA_WIDTH - 1,
+            VGA_HEIGHT - TASK_BAR_HEIGHT - 1,
+            PaletteCode::DarkCyan,
+        );
+        writer.fill_rect(
+            0,
+            VGA_HEIGHT - TASK_BAR_HEIGHT,
+            VGA_WIDTH - 1,
+            VGA_HEIGHT - TASK_BAR_HEIGHT,
+            PaletteCode::Gray,
+        );
+        writer.fill_rect(
+            0,
+            VGA_HEIGHT - TASK_BAR_HEIGHT + 1,
+            VGA_WIDTH - 1,
+            VGA_HEIGHT - TASK_BAR_HEIGHT + 1,
+            PaletteCode::White,
+        );
+        writer.fill_rect(
+            0,
+            VGA_HEIGHT - TASK_BAR_HEIGHT + 2,
+            VGA_WIDTH - 1,
+            VGA_HEIGHT - 1,
+            PaletteCode::Gray,
+        );
 
-    writer.fill_rect(
-        3,
-        VGA_HEIGHT - TASK_BAR_HEIGHT + 4,
-        59,
-        VGA_HEIGHT - TASK_BAR_HEIGHT + 4,
-        PaletteCode::White,
-    );
-    writer.fill_rect(
-        2,
-        VGA_HEIGHT - TASK_BAR_HEIGHT + 4,
-        2,
-        VGA_HEIGHT - 4,
-        PaletteCode::White,
-    );
-    writer.fill_rect(3, VGA_HEIGHT - 4, 59, VGA_HEIGHT - 4, PaletteCode::DarkGray);
-    writer.fill_rect(
-        59,
-        VGA_HEIGHT - TASK_BAR_HEIGHT + 5,
-        59,
-        VGA_HEIGHT - 5,
-        PaletteCode::DarkGray,
-    );
-    writer.fill_rect(2, VGA_HEIGHT - 3, 59, VGA_HEIGHT - 3, PaletteCode::Black);
-    writer.fill_rect(
-        60,
-        VGA_HEIGHT - TASK_BAR_HEIGHT + 4,
-        60,
-        VGA_HEIGHT - 3,
-        PaletteCode::Black,
-    );
+        writer.fill_rect(
+            3,
+            VGA_HEIGHT - TASK_BAR_HEIGHT + 4,
+            59,
+            VGA_HEIGHT - TASK_BAR_HEIGHT + 4,
+            PaletteCode::White,
+        );
+        writer.fill_rect(
+            2,
+            VGA_HEIGHT - TASK_BAR_HEIGHT + 4,
+            2,
+            VGA_HEIGHT - 4,
+            PaletteCode::White,
+        );
+        writer.fill_rect(3, VGA_HEIGHT - 4, 59, VGA_HEIGHT - 4, PaletteCode::DarkGray);
+        writer.fill_rect(
+            59,
+            VGA_HEIGHT - TASK_BAR_HEIGHT + 5,
+            59,
+            VGA_HEIGHT - 5,
+            PaletteCode::DarkGray,
+        );
+        writer.fill_rect(2, VGA_HEIGHT - 3, 59, VGA_HEIGHT - 3, PaletteCode::Black);
+        writer.fill_rect(
+            60,
+            VGA_HEIGHT - TASK_BAR_HEIGHT + 4,
+            60,
+            VGA_HEIGHT - 3,
+            PaletteCode::Black,
+        );
 
-    writer.fill_rect(
-        VGA_WIDTH - 47,
-        VGA_HEIGHT - TASK_BAR_HEIGHT + 4,
-        VGA_WIDTH - 4,
-        VGA_HEIGHT - TASK_BAR_HEIGHT + 4,
-        PaletteCode::DarkGray,
-    );
-    writer.fill_rect(
-        VGA_WIDTH - 47,
-        VGA_HEIGHT - TASK_BAR_HEIGHT + 5,
-        VGA_WIDTH - 47,
-        VGA_HEIGHT - 4,
-        PaletteCode::DarkGray,
-    );
-    writer.fill_rect(
-        VGA_WIDTH - 47,
-        VGA_HEIGHT - 3,
-        VGA_WIDTH - 4,
-        VGA_HEIGHT - 3,
-        PaletteCode::White,
-    );
-    writer.fill_rect(
-        VGA_WIDTH - 3,
-        VGA_HEIGHT - TASK_BAR_HEIGHT + 4,
-        VGA_WIDTH - 3,
-        VGA_HEIGHT - 3,
-        PaletteCode::White,
-    );
+        writer.fill_rect(
+            VGA_WIDTH - 47,
+            VGA_HEIGHT - TASK_BAR_HEIGHT + 4,
+            VGA_WIDTH - 4,
+            VGA_HEIGHT - TASK_BAR_HEIGHT + 4,
+            PaletteCode::DarkGray,
+        );
+        writer.fill_rect(
+            VGA_WIDTH - 47,
+            VGA_HEIGHT - TASK_BAR_HEIGHT + 5,
+            VGA_WIDTH - 47,
+            VGA_HEIGHT - 4,
+            PaletteCode::DarkGray,
+        );
+        writer.fill_rect(
+            VGA_WIDTH - 47,
+            VGA_HEIGHT - 3,
+            VGA_WIDTH - 4,
+            VGA_HEIGHT - 3,
+            PaletteCode::White,
+        );
+        writer.fill_rect(
+            VGA_WIDTH - 3,
+            VGA_HEIGHT - TASK_BAR_HEIGHT + 4,
+            VGA_WIDTH - 3,
+            VGA_HEIGHT - 3,
+            PaletteCode::White,
+        );
+    });
 }
 
 const MOUSE_CURSOR_HEIGHT: usize = 16;
@@ -154,16 +156,18 @@ const MOUSE_CURSOR_IMAGE: [[u8; MOUSE_CURSOR_WIDTH]; MOUSE_CURSOR_HEIGHT] = [
 ];
 
 fn init_mouse_cursor() {
-    let mut writer = WRITER.lock();
-    for y in 0..MOUSE_CURSOR_HEIGHT {
-        for x in 0..MOUSE_CURSOR_WIDTH {
-            match MOUSE_CURSOR_IMAGE[y][x] {
-                b'*' => writer.write_pixel(MOUSE_X + x, MOUSE_Y + y, PaletteCode::Black),
-                b'O' => writer.write_pixel(MOUSE_X + x, MOUSE_Y + y, PaletteCode::White),
-                _ => (),
-            };
+    interrupts::without_interrupts(|| {
+        let mut writer = WRITER.lock();
+        for y in 0..MOUSE_CURSOR_HEIGHT {
+            for x in 0..MOUSE_CURSOR_WIDTH {
+                match MOUSE_CURSOR_IMAGE[y][x] {
+                    b'*' => writer.write_pixel(MOUSE_X + x, MOUSE_Y + y, PaletteCode::Black),
+                    b'O' => writer.write_pixel(MOUSE_X + x, MOUSE_Y + y, PaletteCode::White),
+                    _ => (),
+                };
+            }
         }
-    }
+    });
 }
 
 #[allow(dead_code)]
@@ -351,7 +355,9 @@ mod tests {
     #[test_case]
     fn test_write_pixel() {
         eprint!("test_write_pixel... ");
-        WRITER.lock().write_pixel(3, 5, PaletteCode::White);
+        interrupts::without_interrupts(|| {
+            WRITER.lock().write_pixel(3, 5, PaletteCode::White);
+        });
         eprintln!("[ok]");
     }
 

@@ -2,6 +2,7 @@ use bit_field::BitField;
 use bitflags::bitflags;
 use core::fmt;
 use core::marker::PhantomData;
+use core::ops::{Index, IndexMut};
 
 use crate::x86_64::VirtAddr;
 
@@ -80,6 +81,60 @@ impl InterruptDescriptorTable {
         };
 
         unsafe { lidt(&ptr) }
+    }
+}
+
+impl Index<usize> for InterruptDescriptorTable {
+    type Output = Entry<HandlerFunc>;
+
+    fn index(&self, index: usize) -> &Self::Output {
+        match index {
+            0 => &self.divide_error,
+            1 => &self.debug,
+            2 => &self.non_maskable_interrupt,
+            3 => &self.breakpoint,
+            4 => &self.overflow,
+            5 => &self.bound_range_exceeded,
+            6 => &self.invalid_opcode,
+            7 => &self.device_not_available,
+            9 => &self.coprocessor_segment_overrun,
+            16 => &self.x87_floating_point,
+            19 => &self.simd_floating_point,
+            20 => &self.virtualization,
+            i @ 32..=255 => &self.interrupts[i - 32],
+            i @ 15 | i @ 31 | i @ 21..=29 => panic!("entry {} is reserved", i),
+            i @ 8 | i @ 10..=14 | i @ 17 | i @ 30 => {
+                panic!("entry {} is an exception with error code", i)
+            }
+            i @ 18 => panic!("entry {} is an diverging exception (must not return)", i),
+            i => panic!("no entry with index {}", i),
+        }
+    }
+}
+
+impl IndexMut<usize> for InterruptDescriptorTable {
+    fn index_mut(&mut self, index: usize) -> &mut Self::Output {
+        match index {
+            0 => &mut self.divide_error,
+            1 => &mut self.debug,
+            2 => &mut self.non_maskable_interrupt,
+            3 => &mut self.breakpoint,
+            4 => &mut self.overflow,
+            5 => &mut self.bound_range_exceeded,
+            6 => &mut self.invalid_opcode,
+            7 => &mut self.device_not_available,
+            9 => &mut self.coprocessor_segment_overrun,
+            16 => &mut self.x87_floating_point,
+            19 => &mut self.simd_floating_point,
+            20 => &mut self.virtualization,
+            i @ 32..=255 => &mut self.interrupts[i - 32],
+            i @ 15 | i @ 31 | i @ 21..=29 => panic!("entry {} is reserved", i),
+            i @ 8 | i @ 10..=14 | i @ 17 | i @ 30 => {
+                panic!("entry {} is an exception with error code", i)
+            }
+            i @ 18 => panic!("entry {} is an diverging exception (must not return)", i),
+            i => panic!("no entry with index {}", i),
+        }
     }
 }
 

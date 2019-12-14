@@ -12,11 +12,15 @@ lazy_static! {
 
 #[doc(hidden)]
 pub fn _eprint(args: ::core::fmt::Arguments) {
+    use crate::x86_64::instructions::interrupts;
     use core::fmt::Write;
-    SERIAL1
-        .lock()
-        .write_fmt(args)
-        .expect("Printing to serial failed");
+
+    interrupts::without_interrupts(|| {
+        SERIAL1
+            .lock()
+            .write_fmt(args)
+            .expect("Printing to serial failed");
+    });
 }
 
 /// Prints to the host through the serial interface.
