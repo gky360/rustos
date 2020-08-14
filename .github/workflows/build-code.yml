@@ -39,7 +39,7 @@ jobs:
       - name: "Install Rustup Components"
         run: rustup component add rust-src llvm-tools-preview
       - name: "Install bootimage"
-        run: cargo install bootimage --debug
+        run: cargo install bootimage
 
       - name: "Run cargo build"
         run: cargo build
@@ -75,8 +75,8 @@ jobs:
       - name: "Print QEMU Version"
         run: qemu-system-x86_64 --version
 
-      - name: "Run cargo xtest"
-        run: cargo xtest
+      - name: "Run cargo test"
+        run: cargo test
 
   check_formatting:
     name: "Check Formatting"
