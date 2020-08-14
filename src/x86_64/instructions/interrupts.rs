@@ -7,14 +7,14 @@ pub fn are_enabled() -> bool {
 #[inline]
 pub fn enable() {
     unsafe {
-        asm!("sti" :::: "volatile");
+        llvm_asm!("sti" :::: "volatile");
     }
 }
 
 #[inline]
 pub fn disable() {
     unsafe {
-        asm!("cli" :::: "volatile");
+        llvm_asm!("cli" :::: "volatile");
     }
 }
 
@@ -37,5 +37,5 @@ where
 
 #[inline]
 pub fn int3() {
-    unsafe { asm!("int3" :::: "volatile", "intel") };
+    unsafe { llvm_asm!("int3" :::: "volatile", "intel") };
 }

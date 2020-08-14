@@ -71,7 +71,7 @@ impl RFlags {
     /// Returns the raw current value of the RFLAGS register.
     pub fn read_raw() -> u64 {
         let r: u64;
-        unsafe { asm!("pushfq; popq $0" : "=r"(r) :: "memory") };
+        unsafe { llvm_asm!("pushfq; popq $0" : "=r"(r) :: "memory") };
         r
     }
 }

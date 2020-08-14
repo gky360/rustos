@@ -7,6 +7,6 @@ pub mod tables;
 #[inline]
 pub fn hlt() {
     unsafe {
-        asm!("hlt" :::: "volatile");
+        llvm_asm!("hlt" :::: "volatile");
     }
 }
