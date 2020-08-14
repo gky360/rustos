@@ -38,13 +38,11 @@ jobs:
           cargo -Vv
       - name: "Install Rustup Components"
         run: rustup component add rust-src llvm-tools-preview
-      - name: "Install cargo-xbuild"
-        run: cargo install cargo-xbuild --debug
       - name: "Install bootimage"
         run: cargo install bootimage --debug
 
-      - name: "Run cargo xbuild"
-        run: cargo xbuild
+      - name: "Run cargo build"
+        run: cargo build
       - name: "Create Bootimage"
         run: cargo bootimage
 
