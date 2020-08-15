@@ -5,6 +5,19 @@
 Writing an OS in Rust.
 RustでOS自作入門。
 
+### Development
+
+For development in vscode, follow the steps below.
+
+1. Remove the following line from `.cargo/config`.
+
+```
+[unstable]
+build-std = ["core", "compiler_builtins", "alloc"]
+```
+
+2. Run `cargo install cargo-xbuild && cargo xbuild`. This will generate `target/sysroot` dir that is needed for rls for vscode.
+3. Revert changes you made to `.cargo/config`.
 
 ### References
 

@@ -1,5 +1,5 @@
 {
-  "rust.rustflags": "-L dependency=/Users/inagaki/.rustup/toolchains/nightly-2020-08-13-x86_64-apple-darwin/lib",
-  "rust.sysroot": "/Users/inagaki/.rustup/toolchains/nightly-2020-08-13-x86_64-apple-darwin",
-  "rust.target": "x86_64-rustos.json"
+  "rust.rustflags": "-L dependency=${workspaceFolder}/target/sysroot/lib/rustlib/x86_64-rustos/lib",
+  "rust.sysroot": "/Users/inagaki/dev/src/github.com/gky360/rustos/target/sysroot",
+  "rust.target": "x86_64-rustos.json",
 }
