@@ -3,57 +3,70 @@ name: Build Code
 on:
   push:
     branches:
-      - "*"
-      - "!staging.tmp"
+      - '*'
+      - '!staging.tmp'
     tags:
-      - "*"
+      - '*'
   schedule:
-    - cron: "43 21 * * *" # every day at 21:43 UTC
+    - cron: '43 21 * * *' # every day at 21:43 UTC
   pull_request:
 
 jobs:
-  test:
-    name: "Test"
-
+  check:
+    name: Check
     strategy:
       matrix:
-        platform: [ubuntu-latest, macos-latest, windows-latest]
-
+        platform: [
+          ubuntu-latest,
+          macos-latest,
+          windows-latest
+        ]
     runs-on: ${{ matrix.platform }}
-    timeout-minutes: 15
-
     steps:
-      - name: "Checkout Repository"
-        uses: actions/checkout@v1
+      - name: Checkout Repository
+        uses: actions/checkout@v2
+      - name: Install Rust Toolchain
+        uses: actions-rs/toolchain@v1
+        with:
+          profile: minimal
+          toolchain: nightly
+      - name: Install `rust-src` Rustup Component
+        run: rustup component add rust-src
+      - name: Run `cargo check`
+        uses: actions-rs/cargo@v1
+        with:
+          command: check
 
-      - name: Install Rustup
-        run: |
-          curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y --default-toolchain nightly-2019-11-24
-          echo ::add-path::$HOME/.cargo/bin
-        if: runner.os == 'macOS'
-
-      - name: "Print Rust Version"
-        run: |
-          rustc -Vv
-          cargo -Vv
-      - name: "Install Rustup Components"
+  test:
+    name: Test
+    strategy:
+      matrix:
+        platform: [
+          ubuntu-latest,
+          macos-latest,
+          windows-latest
+        ]
+    runs-on: ${{ matrix.platform }}
+    steps:
+      - name: Install Rust Toolchain
+        uses: actions-rs/toolchain@v1
+        with:
+          profile: minimal
+          toolchain: nightly
+      - name: Install bootimage
+        run: cargo install bootimage --debug
+      - name: Checkout Repository
+        uses: actions/checkout@v2
+      - name: Install Rustup Components
         run: rustup component add rust-src llvm-tools-preview
-      - name: "Install bootimage"
-        run: cargo install bootimage
+      - name: Run `cargo bootimage`
+        uses: actions-rs/cargo@v1
+        with:
+          command: bootimage
 
-      - name: "Run cargo build"
-        run: cargo build
-      - name: "Create Bootimage"
-        run: cargo bootimage
-
-        # install QEMU
+      # install QEMU
       - name: Install QEMU (Linux)
-        run: |
-          # workaround for unsuccessful `apt update`
-          sudo rm -f /etc/apt/sources.list.d/dotnetdev.list /etc/apt/sources.list.d/microsoft-prod.list
-
-          sudo apt update
-          sudo apt install qemu-system-x86
+        run: sudo apt update && sudo apt install qemu-system-x86
         if: runner.os == 'Linux'
       - name: Install QEMU (macOS)
         run: brew install qemu
@@ -75,20 +88,44 @@ jobs:
       - name: "Print QEMU Version"
         run: qemu-system-x86_64 --version
 
-      - name: "Run cargo test"
-        run: cargo test
+      - name: Run `cargo test`
+        uses: actions-rs/cargo@v1
+        with:
+          command: test
 
   check_formatting:
-    name: "Check Formatting"
+    name: Check Formatting
     runs-on: ubuntu-latest
-    timeout-minutes: 2
     steps:
-      - uses: actions/checkout@v1
-      - name: "Use the latest Rust nightly with rustfmt"
+      - name: Checkout Repository
+        uses: actions/checkout@v2
+      - name: Install Rust Toolchain
         uses: actions-rs/toolchain@v1
         with:
-          toolchain: nightly-2019-11-24
           profile: minimal
+          toolchain: nightly
           components: rustfmt
           override: true
-      - run: cargo fmt -- --check
+      - name: Run `cargo fmt`
+        uses: actions-rs/cargo@v1
+        with:
+          command: fmt
+          args: --all -- --check
+
+  clippy:
+    name: Clippy
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v2
+      - name: Install Rust Toolchain
+        uses: actions-rs/toolchain@v1
+        with:
+          profile: minimal
+          toolchain: nightly
+          components: clippy, rust-src
+          override: true
+      - name: Run `cargo clippy`
+        uses: actions-rs/cargo@v1
+        with:
+          command: clippy
