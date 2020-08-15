@@ -2,10 +2,13 @@
 #![cfg_attr(test, no_main)]
 #![feature(abi_x86_interrupt)]
 #![feature(asm)]
+#![feature(llvm_asm)]
 #![feature(const_fn)]
 #![feature(custom_test_frameworks)]
 #![test_runner(crate::test_runner)]
 #![reexport_test_harness_main = "test_main"]
+
+extern crate rlibc;
 
 use core::panic::PanicInfo;
 
