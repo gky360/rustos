@@ -4,6 +4,7 @@
 #![feature(asm)]
 #![feature(llvm_asm)]
 #![feature(const_fn)]
+#![feature(const_mut_refs)]
 #![feature(custom_test_frameworks)]
 #![test_runner(crate::test_runner)]
 #![reexport_test_harness_main = "test_main"]

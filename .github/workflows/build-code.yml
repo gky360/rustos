@@ -16,12 +16,12 @@ jobs:
     name: Check
     strategy:
       matrix:
-        platform: [
+        os: [
           ubuntu-latest,
           macos-latest,
           windows-latest
         ]
-    runs-on: ${{ matrix.platform }}
+    runs-on: ${{ matrix.os }}
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v2
@@ -29,7 +29,7 @@ jobs:
         uses: actions-rs/toolchain@v1
         with:
           profile: minimal
-          toolchain: nightly
+          toolchain: nightly-2020-09-28
       - name: Install `rust-src` Rustup Component
         run: rustup component add rust-src
       - name: Run `cargo check`
@@ -41,18 +41,18 @@ jobs:
     name: Test
     strategy:
       matrix:
-        platform: [
+        os: [
           ubuntu-latest,
           macos-latest,
           windows-latest
         ]
-    runs-on: ${{ matrix.platform }}
+    runs-on: ${{ matrix.os }}
     steps:
       - name: Install Rust Toolchain
         uses: actions-rs/toolchain@v1
         with:
           profile: minimal
-          toolchain: nightly
+          toolchain: nightly-2020-09-28
       - name: Install bootimage
         run: cargo install bootimage --debug
       - name: Checkout Repository
@@ -103,7 +103,7 @@ jobs:
         uses: actions-rs/toolchain@v1
         with:
           profile: minimal
-          toolchain: nightly
+          toolchain: nightly-2020-09-28
           components: rustfmt
           override: true
       - name: Run `cargo fmt`
@@ -122,7 +122,7 @@ jobs:
         uses: actions-rs/toolchain@v1
         with:
           profile: minimal
-          toolchain: nightly
+          toolchain: nightly-2020-09-28
           components: clippy, rust-src
           override: true
       - name: Run `cargo clippy`

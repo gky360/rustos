@@ -1,5 +1,4 @@
 use lazy_static::lazy_static;
-use spin;
 
 use crate::pic8259::ChainedPics;
 use crate::println;
@@ -78,6 +77,7 @@ fn allow_input() {
 #[derive(Debug, Clone, Copy)]
 #[repr(u8)]
 pub enum InterruptIndex {
+    #[allow(clippy::identity_op)]
     Timer = PIC_1_OFFSET + 0,
     Keyboard = PIC_1_OFFSET + 1,
     Mouse = PIC_2_OFFSET + 4,

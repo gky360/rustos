@@ -17,7 +17,7 @@ uart_16550 = "0.2.0"
 volatile = "0.2.6"
 
 [dependencies.bootloader]
-version = "0.9.8"
+version = "0.9.10"
 features = ["map_physical_memory", "vga_320x200"]
 
 [dependencies.font8x8]
