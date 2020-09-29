@@ -158,9 +158,9 @@ const MOUSE_CURSOR_IMAGE: [[u8; MOUSE_CURSOR_WIDTH]; MOUSE_CURSOR_HEIGHT] = [
 fn init_mouse_cursor() {
     interrupts::without_interrupts(|| {
         let mut writer = WRITER.lock();
-        for y in 0..MOUSE_CURSOR_HEIGHT {
-            for x in 0..MOUSE_CURSOR_WIDTH {
-                match MOUSE_CURSOR_IMAGE[y][x] {
+        for (y, row) in MOUSE_CURSOR_IMAGE.iter().enumerate() {
+            for (x, pixcel) in row.iter().enumerate() {
+                match pixcel {
                     b'*' => writer.write_pixel(MOUSE_X + x, MOUSE_Y + y, PaletteCode::Black),
                     b'O' => writer.write_pixel(MOUSE_X + x, MOUSE_Y + y, PaletteCode::White),
                     _ => (),
